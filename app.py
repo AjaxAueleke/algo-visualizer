@@ -160,7 +160,7 @@ def draw_array(sorting,arr, screen, padding, screen_width, x, special_colors={})
 
 
 
-def quick_sort(sorting, arr, screen, padding, screen_width,x, special_colors={}):
+def quick_sort(arr, screen, padding, screen_width,x, special_colors={}):
     sorting = True
     #create an empty stack
     size = len(arr)
