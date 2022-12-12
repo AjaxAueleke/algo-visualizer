@@ -1,8 +1,11 @@
-import sys, pygame, random, time
+import sys
+import pygame
+import random
+import time
 
 pygame.init()
 
-size = width, height = 820, 620
+size = width, height = 720,480
 
 speed = [2, 2]
 
@@ -157,7 +160,7 @@ def heap_sort(arr, screen, padding, screen_width, x):
 
 # random array with 1000 elements
 n = 100
-arr = [random.randint(0, 480 - 2 * 5) for i in range(n)]
+arr = [random.randint(0, 1000 - 2 * 5) for i in range(n)]
 
 print(arr)
 
@@ -166,6 +169,7 @@ def draw_array(sorting, arr, screen, padding, screen_width, x, special_colors={}
     # put a heading
 
     pygame.event.pump()
+
     font = pygame.font.SysFont('Helvetica', 30)
     text = font.render(sorting, 1, (255, 255, 255))
     # draw the array values
@@ -175,8 +179,11 @@ def draw_array(sorting, arr, screen, padding, screen_width, x, special_colors={}
     for i in range(len(arr)):
         if i in special_colors:
             color = special_colors[i]
-        pygame.draw.rect(screen, color, pygame.Rect(x, (520 - 2 * padding) - arr[i], screen_width - padding, arr[i]))
+        pygame.draw.rect(screen, color, pygame.Rect(
+            x-2*padding, (480 - 2 * padding) - arr[i], screen_width - padding, arr[i]))
+
         x = x + screen_width
+    pygame.display.update()
 
 
 def quick_sort(arr, screen, padding, screen_width, x, special_colors={}):
@@ -215,7 +222,8 @@ def quick_sort(arr, screen, padding, screen_width, x, special_colors={}):
         top = top - 1
         # set pivot element at its correct position in sorted array
         p = partition(arr, l, h)
-        draw_array("Quick Sort", arr, screen, padding, screen_width=screen_width, x=x, )
+        draw_array("Quick Sort", arr, screen, padding,
+                   screen_width=screen_width, x=x, )
         # if there are elements on left side of pivot, then push left side to stack
         if p - 1 > l:
             top = top + 1
@@ -231,41 +239,74 @@ def quick_sort(arr, screen, padding, screen_width, x, special_colors={}):
 
 
 def counting_sort(arr, screen, padding, screen_width, x):
+    print("Counting Sort is running...")
     sorting = True
-    # The output character array that will have sorted arr
     output = [0 for i in range(len(arr))]
-    # Create a count array to store count of inidividul characters and initialize count array as 0
     count = [0 for i in range(max(arr) + 1)]
-    # For storing the resulting answer since the
-    # string is immutable
     ans = [0 for _ in arr]
-    # Store count of each character
     for i in arr:
         count[i] += 1
-        draw_array("Counting Sort", arr, screen, padding, screen_width=screen_width, x=x,
+        draw_array("Count Array", count, screen, padding, screen_width=screen_width, x=x,
                    special_colors={i: (0, 255, 0), })
+        pygame.display.update()
+        pygame.time.wait(5)
+
+    screen.fill((0, 0, 0))
     # Change count[i] so that count[i] now contains actual position of this character in output array
-    for i in range(256):
+    for i in range(1, len(count) - 1):
         count[i] += count[i - 1]
-        draw_array("Counting Sort", arr, screen, padding, screen_width=screen_width, x=x,
+        draw_array("Counting Sort", count, screen, padding, screen_width=screen_width, x=x,
                    special_colors={i: (0, 255, 0), i - 1: (0, 0, 255)})
-    # Build the output character array
-    for i in range(len(arr)):
+        pygame.display.update()
+        pygame.time.wait(5)
+    screen.fill((0, 0, 0))
+    for i in range(len(arr) - 1):
         output[count[arr[i]] - 1] = arr[i]
         count[arr[i]] -= 1
-    # Copy the output array to arr, so that arr now
-    # contains sorted characters
+        draw_array("Counting Sort", output, screen, padding,
+                   screen_width=screen_width, x=x, special_colors={i: (0, 255, 0)})
+        pygame.display.update()
+        pygame.time.wait(5)
+
+
+    screen.fill((0, 0, 0))
     for i in range(len(arr)):
         ans[i] = output[i]
         draw_array("Counting Sort", ans, screen, padding, screen_width=screen_width, x=x,
                    special_colors={i: (0, 255, 0)})
+        pygame.display.update()
+    screen.fill((0, 0, 0))
     arr = ans
+    sorting = False
+
+
+def radix_sort(arr, screen, padding, screen_width, x):
+    sorting = True
+    iter = max(arr)
+    maxIter = len(str(iter))
+
+    exp = 1
+    for i in range(maxIter + 1):
+        counting_sort(arr, screen, padding, screen_width, x)
+        draw_array("Radix Sort", arr, screen, padding,
+                   screen_width=screen_width, x=x)
+        pygame.display.update()
+        pygame.time.wait(5)
+        screen.fill((0, 0, 0))
+        exp *= 10
     sorting = False
 
 
 sorting = False
 menu = True
 
+def read_array(n):
+    arr = []
+    with open("array.txt", "r") as f:
+        for line in f:
+            arr.append(int(line))
+
+    return arr[0:n] if n < len(arr) else arr
 
 def draw_menu():
     screen.fill((0, 0, 0))
@@ -278,6 +319,8 @@ def draw_menu():
     text3 = font.render("Press 3 for Merge Sort", 1, (255, 255, 255))
     text4 = font.render("Press 4 for Heap Sort", 1, (255, 255, 255))
     text5 = font.render("Press 5 for Quick Sort", 1, (255, 255, 255))
+    text6 = font.render("Press 6 for Counting Sort", 1, (255, 255, 255))
+    text7 = font.render("Press 7 for Radix Sort", 1, (255, 255, 255))
 
     screen.blit(text, (100, 0))
     screen.blit(text1, (100, 50))
@@ -285,7 +328,10 @@ def draw_menu():
     screen.blit(text3, (100, 150))
     screen.blit(text4, (100, 200))
     screen.blit(text5, (100, 250))
+    screen.blit(text6, (100, 300))
+    screen.blit(text7, (100, 350))
     pygame.display.update()
+    pygame.time.wait(10)
 
 
 while True:
@@ -303,34 +349,55 @@ while True:
             if event.key == pygame.K_1 and not sorting:
                 pygame.event.pump()
                 sorting_name = "Bubble Sort"
+                arr = read_array(n)
                 screen.fill(black)
-                bubble_sort(arr, screen, padding=padding, screen_width=screen_width, x=padding)
+                bubble_sort(arr, screen, padding=padding,
+                            screen_width=screen_width, x=padding)
             if event.key == pygame.K_2 and not sorting:
                 pygame.event.pump()
                 sorting_name = "Insertion Sort"
+                
                 screen.fill(black)
-                insertion_sort(arr, screen, padding=padding, screen_width=screen_width, x=padding)
+                arr = read_array(n)
+                insertion_sort(arr, screen, padding=padding,
+                               screen_width=screen_width, x=padding)
             if event.key == pygame.K_3 and not sorting:
                 pygame.event.pump()
                 sorting_name = "Merge Sort"
                 screen.fill(black)
-                merge_sort(arr, screen, padding=padding, screen_width=screen_width, x=padding)
+                arr = read_array(n)
+                merge_sort(arr, screen, padding=padding,
+                           screen_width=screen_width, x=padding)
             if event.key == pygame.K_4 and not sorting:
                 pygame.event.pump()
                 sorting_name = "Heap Sort"
                 screen.fill(black)
-                heap_sort(arr, screen, padding=padding, screen_width=screen_width, x=padding)
+                arr = read_array(n)
+                heap_sort(arr, screen, padding=padding,
+                          screen_width=screen_width, x=padding)
             if event.key == pygame.K_5 and not sorting:
                 pygame.event.pump()
                 sorting_name = "Quick Sort"
                 screen.fill(black)
-                quick_sort(arr, screen, padding=padding, screen_width=screen_width, x=padding)
+                arr = read_array(n)
+                quick_sort(arr, screen, padding=padding,
+                           screen_width=screen_width, x=padding)
             if event.key == pygame.K_6 and not sorting:
                 print("Counting Sort")
                 pygame.event.pump()
                 sorting_name = "Counting Sort"
                 screen.fill(black)
-                counting_sort(arr, screen, padding=padding, screen_width=screen_width, x=padding)
+                arr = read_array(n)
+                counting_sort(arr, screen, padding=padding,
+                              screen_width=screen_width, x=padding)
+            if event.key == pygame.K_7 and not sorting:
+                print("Radix Sort")
+                pygame.event.pump()
+                sorting_name = "Radix Sort"
+                screen.fill(black)
+                arr = read_array(n)
+                radix_sort(arr, screen, padding=padding,
+                           screen_width=screen_width, x=padding)
 
     clock.tick(3)
     if not sorting:
