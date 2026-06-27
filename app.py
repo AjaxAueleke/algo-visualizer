@@ -146,8 +146,11 @@ def heap_sort(arr, screen, padding, screen_width, x):
     # The main function to sort an array of given size
     def heapSort(arr):
         n = len(arr)
-        # Build a maxheap.
-        for i in range(n, -1, -1):
+        # Build a maxheap. Only the internal nodes (indices 0 .. n//2 - 1) need
+        # to be heapified; the second half of the array are leaves that are
+        # already trivial heaps. Starting from the last non-leaf node and
+        # walking back to the root sifts every subtree into heap order.
+        for i in range(n // 2 - 1, -1, -1):
             heapify(arr, n, i)
         # One by one extract elements
         for i in range(n - 1, 0, -1):
