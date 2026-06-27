@@ -208,39 +208,30 @@ def quick_sort(arr, screen, padding, screen_width, x, special_colors={}):
 
     global sorting
     sorting = True
-    # create an empty stack
     size = len(arr)
-    stack = [0] * (size)
-    # initialize top of stack
-    top = -1
-    # push initial values of l and h to stack
-    top = top + 1
-    stack[top] = 0
-    top = top + 1
-    stack[top] = size - 1
-    # keep popping from stack while is not empty
-    while top >= 0:
-        # pop h and l
-        h = stack[top]
-        top = top - 1
-        l = stack[top]
-        top = top - 1
+    if size < 2:
+        # Nothing to sort (empty or single element); also avoids indexing an
+        # empty range below.
+        sorting = False
+        return
+    # Use a real Python list as a growable LIFO stack of (low, high) ranges.
+    # A fixed-size [0] * size buffer could be indexed out of bounds because the
+    # very first push (the full range) already needs two slots, and adversarial
+    # inputs (already-sorted / reverse-sorted) drive the most unbalanced
+    # recursion; a dynamic stack can never overflow.
+    stack = [(0, size - 1)]
+    while stack:
+        l, h = stack.pop()
         # set pivot element at its correct position in sorted array
         p = partition(arr, l, h)
         draw_array("Quick Sort", arr, screen, padding,
                    screen_width=screen_width, x=x, )
-        # if there are elements on left side of pivot, then push left side to stack
+        # if there are elements on the left side of the pivot, push that range
         if p - 1 > l:
-            top = top + 1
-            stack[top] = l
-            top = top + 1
-            stack[top] = p - 1
-        # if there are elements on right side of pivot, then push right side to stack
+            stack.append((l, p - 1))
+        # if there are elements on the right side of the pivot, push that range
         if p + 1 < h:
-            top = top + 1
-            stack[top] = p + 1
-            top = top + 1
-            stack[top] = h
+            stack.append((p + 1, h))
     sorting = False
 
 
