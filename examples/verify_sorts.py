@@ -37,6 +37,27 @@ SORTS = {
 }
 
 
+# Adversarial / boundary inputs. These specifically exercise the deferred fixes:
+#   - quick_sort: a fixed-size stack used to overflow on already-sorted / reverse
+#     input and on tiny arrays (the full-range push alone needs two slots).
+#   - heap_sort: the build-heap loop used to start past the last non-leaf node.
+EDGE_CASES = {
+    "sorted": list(range(30)),
+    "reverse": list(range(30, 0, -1)),
+    "duplicates": [7, 7, 3, 3, 9, 1, 1, 1, 5, 9, 3, 7, 0, 0, 5],
+    "all_equal": [4] * 20,
+    "two": [2, 1],
+    "single": [42],
+    "empty": [],
+}
+
+# The sorts whose iterative/structural fixes the edge cases are meant to guard.
+EDGE_SORTS = {
+    "heap_sort": app.heap_sort,
+    "quick_sort": app.quick_sort,
+}
+
+
 def main():
     random.seed(1234)
     failures = []
@@ -51,11 +72,28 @@ def main():
             print(f"    expected: {expected}")
             print(f"    got:      {data}")
 
+    print("\nEdge cases (quick_sort & heap_sort):")
+    for sort_name, fn in EDGE_SORTS.items():
+        for case_name, case in EDGE_CASES.items():
+            data = list(case)
+            expected = sorted(data)
+            fn(data, app.screen, PADDING, SCREEN_WIDTH, X)
+            ok = data == expected
+            label = f"{sort_name} / {case_name}"
+            print(f"  {'PASS' if ok else 'FAIL'}: {label}")
+            if not ok:
+                failures.append(label)
+                print(f"      expected: {expected}")
+                print(f"      got:      {data}")
+
     app.pygame.quit()
     if failures:
-        print(f"\n{len(failures)} sort(s) FAILED: {', '.join(failures)}")
+        print(f"\n{len(failures)} check(s) FAILED: {', '.join(failures)}")
         sys.exit(1)
-    print(f"\nAll {len(SORTS)} sorts produced correctly sorted output.")
+    print(
+        f"\nAll {len(SORTS)} sorts plus "
+        f"{len(EDGE_SORTS) * len(EDGE_CASES)} edge cases passed."
+    )
 
 
 if __name__ == "__main__":
