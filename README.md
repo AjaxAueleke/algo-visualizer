@@ -51,6 +51,16 @@ python app.py
 
 A window titled **"Algorithm Visualizer"** opens with the menu.
 
+### Verifying the sorts
+
+The sorting algorithms can be checked without opening a window. The harness runs
+every sort against a shuffled list using pygame's dummy SDL drivers and asserts
+the output is fully sorted:
+
+```bash
+python examples/verify_sorts.py
+```
+
 ## Controls
 
 | Input              | Action                                                      |
@@ -66,18 +76,20 @@ integers are visualized).
 ## Tech stack
 
 - **Language:** Python 3
-- **Graphics / event loop:** [pygame](https://www.pygame.org/) 2.1.2
+- **Graphics / event loop:** [pygame](https://www.pygame.org/) 2.6.1 (ships wheels for Python 3.12)
 
 ## Project structure
 
 ```
 algo-visualizer/
-├── app.py            # Main visualizer — menu + the 7 sorts (entry point)
-├── array.txt         # Data set of 1,000 integers (first 100 are visualized)
-├── first_q.py        # Standalone quick-sort sandbox (SPACE to run, Esc to quit)
-├── second_q.py       # Counting-sort + a range-query CLI utility
-├── requirements.txt  # Python dependencies
-├── docs/             # Documentation assets (demo GIF lives here)
+├── app.py               # Main visualizer — menu + the 7 sorts (entry point)
+├── array.txt            # Data set of 1,000 integers (first 100 are visualized)
+├── examples/            # Standalone sandboxes + a headless test harness
+│   ├── first_q.py       # Standalone quick-sort sandbox (SPACE to run, Esc to quit)
+│   ├── second_q.py      # Counting-sort + a range-query CLI utility
+│   └── verify_sorts.py  # Headless correctness check for all 7 sorts
+├── requirements.txt     # Python dependencies
+├── docs/                # Documentation assets (demo GIF lives here)
 └── LICENSE
 ```
 
