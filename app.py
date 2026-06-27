@@ -354,6 +354,12 @@ def draw_menu():
 if __name__ == "__main__":
     arr = [random.randint(0, 1000 - 2 * 5) for i in range(n)]
 
+    # Initialize the layout values the key handlers read. screen_width is
+    # otherwise only computed at the bottom of the loop, so a key press on the
+    # very first frame would dereference it before assignment (NameError).
+    padding = screen.get_width() // n * 0.05
+    screen_width = (screen.get_width() - 2 * padding) / n
+
     while True:
         sorting_name = "No sorting algorithm selected"
         padding = screen.get_width() // n * 0.05
